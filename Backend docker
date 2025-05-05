@@ -1,0 +1,26 @@
+# Use a base image with Java (choose a version compatible with your Spring Boot app)
+FROM openjdk:17-jdk-slim
+
+# Set the working directory inside the container
+WORKDIR /app
+
+# Copy the Maven build file (pom.xml) and download dependencies
+COPY pom.xml .
+COPY src ./src
+
+# Copy the Maven wrapper (if you use it, optional)
+COPY .mvn .mvn
+COPY mvnw mvnw
+COPY mvnw.cmd mvnw.cmd
+
+# Build the application using Maven
+RUN ./mvnw clean package -DskipTests
+
+# Copy the built JAR file into the container
+COPY target/*.jar app.jar
+
+# Expose the port your Spring Boot app runs on (default is 8080)
+EXPOSE 8080
+
+# Run the Spring Boot application
+ENTRYPOINT ["java", "-jar", "app.jar"]
